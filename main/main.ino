@@ -19,7 +19,7 @@ int ledArray[5];
 int menu = 1;
 
 // declare an SSD1306 display object connected to I2C
-// Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 Adafruit_NeoPixel leds(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -50,12 +50,12 @@ void setup()
   pinMode(buttonThumbLeft, INPUT);
   pinMode(buttonThumbRight, INPUT);
 
-  // // initialize OLED display with address 0x3C for 128x64
-  // if (!oled.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-  //   Serial.println(F("SSD1306 allocation failed"));
-  //   while (true);
-  // }
-  // delay(2000);         // wait for initializing
+  // initialize OLED display with address 0x3C for 128x64
+  if (!oled.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    while (true);
+  }
+  delay(2000);         // wait for initializing
 
   // showComo();
   leds.begin();           // INITIALIZE NeoPixel leds object (REQUIRED)
@@ -108,11 +108,11 @@ void selectThumb() {
       buttonScroll = A0;
       ledThumb = ledThumbLeft;
       Serial.println("rechts");
-      // oled.clearDisplay();
-      // oled.setCursor(10, 20);
-      // oled.setTextSize(3);
-      // oled.println("RECHTS");
-      // oled.display();
+      oled.clearDisplay();
+      oled.setCursor(10, 20);
+      oled.setTextSize(3);
+      oled.println("RECHTS");
+      oled.display();
       delay(1500);
       thumbRecognition = true;
     }
@@ -122,11 +122,11 @@ void selectThumb() {
       buttonScroll = A3;
       ledThumb = ledThumbRight;
       Serial.println("links");
-      // oled.clearDisplay();
-      // oled.setCursor(20, 20);
-      // oled.setTextSize(3);
-      // oled.println("LINKS");
-      // oled.display();
+      oled.clearDisplay();
+      oled.setCursor(20, 20);
+      oled.setTextSize(3);
+      oled.println("LINKS");
+      oled.display();
       delay(1500);
       thumbRecognition = true;
     }
@@ -228,68 +228,69 @@ int getThumb() {
 
 // --------------------------------------------------- OLED -------------------------------------------------------
 
-// void showComo() {
-//   oled.clearDisplay();
-//   oled.setTextSize(5);
-//   oled.setTextColor(WHITE);
-//   oled.setCursor(7, 15);
-//   oled.println("COMO");
-//   oled.display();
-//   delay(5000);
-// }
+void showComo() {
+  oled.clearDisplay();
+  oled.setTextSize(5);
+  oled.setTextColor(WHITE);
+  oled.setCursor(7, 15);
+  oled.println("COMO");
+  oled.display();
+  delay(5000);
+}
 
 void showThumb() {
   Serial.println("daumen drücken");
-  //   oled.clearDisplay();
-  //   oled.setTextSize(3);
-  //   oled.setTextColor(WHITE);
-  //   oled.setCursor(13, 10);
-  //   oled.println("Daumen");
-  //   oled.setTextSize(2);
-  //   oled.setCursor(17, 40);
-  //   oled.println("druecken");
-  //   oled.display();
-  //
+    oled.clearDisplay();
+    oled.setTextSize(3);
+    oled.setTextColor(WHITE);
+    oled.setCursor(13, 10);
+    oled.println("Daumen");
+    oled.setTextSize(2);
+    oled.setCursor(17, 40);
+    oled.println("druecken");
+    oled.display();
+  
 }
 
 void showMenu(String game) {
-  // oled.clearDisplay();
-  // oled.setTextSize(2);
-  // oled.setTextColor(WHITE);
-  // oled.setCursor(1, game);
-  // oled.println(">");
-  // oled.setCursor(20, 10);
-  // oled.println("Reaktion L");
-  // oled.setCursor(20, 35);
-  // oled.println("Merken L");
-  // oled.display();
+  oled.clearDisplay();
+  oled.setTextSize(2);
+  oled.setTextColor(WHITE);
+  //oled.setCursor(1, game);
+  oled.setCursor(1, 1);
+  oled.println(">");
+  oled.setCursor(20, 10);
+  oled.println("Reaktion L");
+  oled.setCursor(20, 35);
+  oled.println("Merken L");
+  oled.display();
   Serial.print("main menu: ");
   Serial.println(game);
 }
 
 void showReactionStart() {
-  // oled.clearDisplay();
-  // oled.setTextSize(2);
-  // oled.setTextColor(WHITE);
-  // oled.setCursor(10, 10);
-  // oled.println("REAKTIONS");
-  // oled.setTextSize(3);
-  // oled.setCursor(20, 35);
-  // oled.println("SPIEL");
-  // oled.display();
+  oled.clearDisplay();
+  oled.setTextSize(2);
+  oled.setTextColor(WHITE);
+  oled.setCursor(10, 10);
+  oled.println("REAKTIONS");
+  oled.setTextSize(3);
+  oled.setCursor(20, 35);
+  oled.println("SPIEL");
+  oled.display();
   Serial.println("reactionsspiel start");
   delay(2000);
 }
 
 void showMemoryStart() {
-  // oled.clearDisplay();
-  // oled.setTextSize(3);
-  // oled.setTextColor(WHITE);
-  // oled.setCursor(30, 10);
-  // oled.println("MERK");
-  // oled.setCursor(20, 35);
-  // oled.println("SPIEL");
-  // oled.display();
+  oled.clearDisplay();
+  oled.setTextSize(3);
+  oled.setTextColor(WHITE);
+  oled.setCursor(30, 10);
+  oled.println("MERK");
+  oled.setCursor(20, 35);
+  oled.println("SPIEL");
+  oled.display();
   Serial.println("memoryspiel start");
   delay(2000);
 }
@@ -336,7 +337,8 @@ void rainbowFade2White(int wait, int rainbowLoops, int whiteLoops) {
   delay(500); 
 }
 
-void ledOn(int led, int r = 0, int g = 150, int b = 100)
+//void ledOn(int led, int r = 0, int g = 150, int b = 100)
+void ledOn(int led, int r, int g, int b)
 {
   leds.clear(); // Set all pixel colors to 'off'
   leds.setPixelColor(led, leds.Color(r, g, b));

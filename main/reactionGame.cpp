@@ -4,7 +4,7 @@
 
 int rndNumVib = 0;
 int rndNumLed = 0;
-int index = 0;
+int idx = 0;
 int indexOld = 0;
 int vibration = 0;
 int cntWrong = 0;
