@@ -4,6 +4,7 @@
 #include "definitions.h"
 #include "reactionGame.h"
 #include "memoryGame.h"
+#include "corsiBlockTest.h"
 
 bool gameFinished = true;
 bool thumbRecognition = false;
@@ -23,6 +24,9 @@ Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 Adafruit_NeoPixel leds(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
+CorsiBlockTest corsi(9, true);
+
+
 //flags for button pushes
 bool prestate1;
 bool prestate2;
@@ -34,7 +38,7 @@ Mode mode = both; // default
 
 void setup()
 {
-  Serial.begin(19200);
+  Serial.begin(9600);
   //initialization of pins
   pinMode(vibration1, OUTPUT);
   pinMode(vibration2, OUTPUT);
@@ -65,34 +69,47 @@ void setup()
   
   selectThumb();
   initialize();
+
+
+  startCorsi();
+
 }
 
 void loop()
 {
-  updateMenu();
+  // updateMenu();
 
   // scroll menu
-  if (analogRead(buttonScroll) > THRESHOLD && !prestateScroll) {
-    menu++;
-    if (menu > 6) {
-      menu = 1;
-    }
-    updateMenu();
-    prestateScroll = true;
-    delay(500);
-  }
-  else if (analogRead(buttonScroll) < THRESHOLD){
-    prestateScroll = false;
-  }
+  // if (analogRead(buttonScroll) > THRESHOLD && !prestateScroll) {
+  //   menu++;
+  //   if (menu > 6) {
+  //     menu = 1;
+  //   }
+  //   updateMenu();
+  //   prestateScroll = true;
+  //   delay(500);
+  // }
+  // else if (analogRead(buttonScroll) < THRESHOLD){
+  //   prestateScroll = false;
+  // }
 
   // select game
-  if (analogRead(buttonThumb) >= THRESHOLD && !prestateSelect) {
+  if (analogRead(buttonThumb) >= THRESHOLD){ //} && !prestateSelect) {
+    
+    showCorsi();
+    
     startGame();
-    prestateSelect = true;
+    // If done show score and wait
+
+    showScore(corsi.getScore());
+
+    delay(5000); // for safety, it should stay there anyways
+
+    // prestateSelect = true;
   }
-  else {
-    prestateSelect = false;
-  }
+  // else {
+  //   prestateSelect = false;
+  // }
 
   delay(100);
 }
@@ -157,38 +174,42 @@ void updateMenu () {
 }
 
 void startGame() {
-  switch (menu) {
-    case 1:
-      mode = led;
-      showReactionStart();
-      action1();
-      break;
-    case 2:
-      mode = vib;
-      showReactionStart();
-      action1();
-      break;
-    case 3:
-      mode = both;
-      showReactionStart();
-      action1();
-      break;
-    case 4:
-      mode = led;
-      showMemoryStart();
-      action2();
-      break;
-    case 5:
-      mode = vib;
-      showMemoryStart();
-      action2();
-      break;
-    case 6:
-      mode = both;
-      showMemoryStart();
-      action2();
-      break;
-  }
+
+
+  corsi.runCorsiBlockTest();
+
+  // switch (menu) {
+  //   case 1:
+  //     mode = led;
+  //     showReactionStart();
+  //     action1();
+  //     break;
+  //   case 2:
+  //     mode = vib;
+  //     showReactionStart();
+  //     action1();
+  //     break;
+  //   case 3:
+  //     mode = both;
+  //     showReactionStart();
+  //     action1();
+  //     break;
+  //   case 4:
+  //     mode = led;
+  //     showMemoryStart();
+  //     action2();
+  //     break;
+  //   case 5:
+  //     mode = vib;
+  //     showMemoryStart();
+  //     action2();
+  //     break;
+  //   case 6:
+  //     mode = both;
+  //     showMemoryStart();
+  //     action2();
+  //     break;
+  // }
 }
 
 void initialize() {
@@ -267,6 +288,56 @@ void showMenu(String game) {
   Serial.print("main menu: ");
   Serial.println(game);
 }
+
+
+void startCorsi() {
+  oled.clearDisplay();
+  oled.setTextSize(2);
+  oled.setTextColor(WHITE);
+  //oled.setCursor(1, game);
+  // oled.setCursor(1, 1);
+  // oled.println(">");
+  oled.setCursor(10, 10);
+  oled.println("Press thumb");
+  oled.setCursor(10, 35);
+  oled.println("to start!");
+  oled.display();
+  Serial.print("Corsi Start: ");
+  Serial.println("Press Button");
+}
+
+void showCorsi() {
+  oled.clearDisplay();
+  oled.setTextSize(2);
+  oled.setTextColor(WHITE);
+  //oled.setCursor(1, game);
+  // oled.setCursor(1, 1);
+  // oled.println(">");
+  oled.setCursor(10, 10);
+  oled.println("Corsi");
+  oled.setCursor(10, 35);
+  oled.println("Running");
+  oled.display();
+  Serial.print("Corsi");
+  Serial.println("Running");
+}
+
+void showScore(int score) {
+  oled.clearDisplay();
+  oled.setTextSize(2);
+  oled.setTextColor(WHITE);
+  //oled.setCursor(1, game);
+  oled.setCursor(1, 1);
+  oled.println(">");
+  oled.setCursor(20, 10);
+  oled.println("Score:");
+  oled.setCursor(20, 35);
+  oled.println(score);
+  oled.display();
+  Serial.print("Corsi Score: ");
+  Serial.println(score);
+}
+
 
 void showReactionStart() {
   oled.clearDisplay();
