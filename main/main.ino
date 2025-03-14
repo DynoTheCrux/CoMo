@@ -73,6 +73,8 @@ void setup()
 
   startCorsi();
 
+  corsi.setSpeed(5);
+
 }
 
 void loop()
@@ -213,17 +215,27 @@ void startGame() {
 }
 
 void initialize() {
-  vibrations[0] = vibration1;
-  vibrations[1] = vibration2;
-  vibrations[2] = vibration3;
-  vibrations[3] = vibration4;
-  vibrations[4] = vibrationThumb;
+  vibrations[1] = vibration1;
+  vibrations[2] = vibration2;
+  vibrations[3] = vibration3;
+  vibrations[4] = vibration4;
+  vibrations[0] = vibrationThumb;
 
-  ledArray[0] = led1;
-  ledArray[1] = led2;
-  ledArray[2] = led3;
-  ledArray[3] = led4;
-  ledArray[4] = ledThumb;
+
+  for(int i = 0; i<5; i++)
+  {
+    analogWrite(vibrations[i], SPEED);
+    delay(1000);
+    analogWrite(vibrations[i], 0);
+    delay(2000);
+  }
+
+
+  ledArray[1] = led1;
+  ledArray[2] = led2;
+  ledArray[3] = led3;
+  ledArray[4] = led4;
+  ledArray[0] = ledThumb;
 }
 
 // --------------------------------------------------- CALIBRATE ---------------------------------------------------------
@@ -297,9 +309,9 @@ void startCorsi() {
   //oled.setCursor(1, game);
   // oled.setCursor(1, 1);
   // oled.println(">");
-  oled.setCursor(10, 10);
-  oled.println("Press thumb");
-  oled.setCursor(10, 35);
+  oled.setCursor(15, 10);
+  oled.println("Press");
+  oled.setCursor(1, 35);
   oled.println("to start!");
   oled.display();
   Serial.print("Corsi Start: ");
@@ -327,8 +339,8 @@ void showScore(int score) {
   oled.setTextSize(2);
   oled.setTextColor(WHITE);
   //oled.setCursor(1, game);
-  oled.setCursor(1, 1);
-  oled.println(">");
+  // oled.setCursor(1, 1);
+  // oled.println(">");
   oled.setCursor(20, 10);
   oled.println("Score:");
   oled.setCursor(20, 35);

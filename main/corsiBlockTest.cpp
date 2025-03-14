@@ -7,7 +7,8 @@ CorsiBlockTest::CorsiBlockTest(int maxSequenceLength, bool withVibration) {
   this->sequenceLength = 2;  // Start with 2 blocks
   this->sequence = new int[maxSequenceLength];
   this->userInputIndex = 0;
-  if (withVibration) {
+  this->vibration = withVibration;
+  if (vibration) {
     threshold = THRESHOLD_VIB;
   } else {
     threshold = THRESHOLD;
@@ -32,12 +33,28 @@ void CorsiBlockTest::generateSequence() {
 
 void CorsiBlockTest::playSequence() {
   for (int i = 0; i < sequenceLength; i++) {
-    lightUpBlock(sequence[i]);
     delay(LIGHT_TIME);
+    lightUpBlock(sequence[i]);
+    if(vibration)
+    {
+      analogWrite(vibrations[sequence[i]], SPEED);
+    }
+    delay(LIGHT_TIME);
+    vibrationOff();
+    ledOff();
+
   }
   // turn of leds
 
-  ledOff();
+  
+}
+
+void CorsiBlockTest::vibrationOff() {
+  analogWrite(vibration1, 0);
+  analogWrite(vibration2, 0);
+  analogWrite(vibration3, 0);
+  analogWrite(vibration4, 0);
+  analogWrite(vibrationThumb, 0);
 }
 
 void CorsiBlockTest::waitForUserInput() {  // needed?
@@ -48,11 +65,18 @@ void CorsiBlockTest::resetTest() {
   sequenceLength = 2;
 }
 
+void CorsiBlockTest::setSpeed(int speed)
+{
+
+  LIGHT_TIME = map(speed, 0, 10, 1500, 500);
+
+}
+
 void CorsiBlockTest::lightUpBlock(int blockIndex) {
   // map to LED
 
   // analogWrite(blockIndex, SPEED);
-  ledOn(blockIndex);
+  ledOn(ledArray[blockIndex]);
 }
 
 int CorsiBlockTest::checkUserInput() {
@@ -84,7 +108,7 @@ int CorsiBlockTest::checkUserInput() {
 
     } else if (getThumb() > threshold) {
       ledOn(ledThumb);
-      result = ledThumb;
+      result = 0; // hardcode for two thumbs...
       waitForPress = false;
     }
   }
@@ -93,7 +117,7 @@ int CorsiBlockTest::checkUserInput() {
 
   // // debounce
   while (getFinger1() > threshold || getFinger2() > threshold || getFinger3() > threshold || getFinger4() > threshold || getThumb() > threshold) {
-    delay(200);
+    delay(500);
   }
 
   return result;
@@ -153,6 +177,9 @@ void CorsiBlockTest::runCorsiBlockTest() {
 
     if (sequenceLength > maxSequenceLength || life < 1) {
       oneMoreRound = false;
+      score = sequenceLength-1;
+      sequenceLength = 2;
+      ledOff();
     }
 
     Serial.print("Round Done: ");
@@ -169,6 +196,5 @@ void CorsiBlockTest::runCorsiBlockTest() {
 }
 
 int CorsiBlockTest::getScore() {
-  score = sequenceLength;
   return score;
 }
