@@ -13,6 +13,7 @@ CorsiBlockTest::CorsiBlockTest(int maxSequenceLength, bool withVibration) {
   } else {
     threshold = THRESHOLD;
   }
+  releaseThreshold = threshold - 20; // offset for debouncing
 }
 
 void CorsiBlockTest::begin() {
@@ -21,14 +22,14 @@ void CorsiBlockTest::begin() {
 }
 
 void CorsiBlockTest::generateSequence() {
-  Serial.print("Sequence: ");
+  // Serial.print("Sequence: ");
 
   for (int i = 0; i < sequenceLength; i++) {
     sequence[i] = random(0, numBlocks);  // Generate random block indices
-    Serial.print(sequence[i]);
-    Serial.print(" ");
+    // Serial.print(sequence[i]);
+    // Serial.print(" ");
   }
-  Serial.println(";");
+  // Serial.println(";");
 }
 
 void CorsiBlockTest::playSequence() {
@@ -102,21 +103,25 @@ int CorsiBlockTest::checkUserInput() {
       waitForPress = false;
 
     } else if (getFinger4() > threshold) {
+      //Serial.println(getFinger4());
       ledOn(4);
       result = 4;
       waitForPress = false;
 
     } else if (getThumb() > threshold) {
+      
       ledOn(ledThumb);
       result = 0; // hardcode for two thumbs...
       waitForPress = false;
     }
   }
 
-  Serial.println(result);
+  // Serial.println(result);
 
   // // debounce
-  while (getFinger1() > threshold || getFinger2() > threshold || getFinger3() > threshold || getFinger4() > threshold || getThumb() > threshold) {
+  while (getFinger1() > releaseThreshold || getFinger2() > releaseThreshold || getFinger3() > releaseThreshold || getFinger4() > releaseThreshold || getThumb() > releaseThreshold) {
+          //Serial.println(getFinger4());
+
     delay(500);
   }
 
@@ -165,6 +170,23 @@ void CorsiBlockTest::runCorsiBlockTest() {
     // if right increase lvl, if already max length end game
     // if wrong remove life, if no lifes end game
 
+        Serial.print(sequenceLength);
+    Serial.print(",");
+    for (int i = 0; i < sequenceLength; i++) {
+      
+      Serial.print(sequence[i]);
+      Serial.print(",");
+    }
+
+    for (int i = 0; i < sequenceLength; i++) {
+
+      Serial.print(result[i]);
+      Serial.print(",");
+
+    }
+
+    Serial.println("");
+
     
     
 
@@ -182,15 +204,17 @@ void CorsiBlockTest::runCorsiBlockTest() {
       ledOff();
     }
 
-    Serial.print("Round Done: ");
-    Serial.print(correct);
-    Serial.print(",");
-    Serial.print(sequenceLength);
-    Serial.print(",");
-    Serial.print(life);
-    Serial.print(",");
-    Serial.print(oneMoreRound);
-    Serial.println(" ");
+    // Serial.print("Round Done: ");
+    // Serial.print(correct);
+    // Serial.print(",");
+    // Serial.print(sequenceLength);
+    // Serial.print(",");
+    // Serial.print(life);
+    // Serial.print(",");
+    // Serial.print(oneMoreRound);
+    // Serial.println(" ");
+
+    
 
   }
 }

@@ -126,7 +126,7 @@ void selectThumb() {
       vibrationThumb = vibrationThumbLeft;
       buttonScroll = A0;
       ledThumb = ledThumbLeft;
-      Serial.println("rechts");
+      // Serial.println("rechts");
       oled.clearDisplay();
       oled.setCursor(10, 20);
       oled.setTextSize(3);
@@ -140,7 +140,7 @@ void selectThumb() {
       vibrationThumb = vibrationThumbRight;
       buttonScroll = A3;
       ledThumb = ledThumbRight;
-      Serial.println("links");
+      // Serial.println("links");
       oled.clearDisplay();
       oled.setCursor(20, 20);
       oled.setTextSize(3);
@@ -221,14 +221,14 @@ void initialize() {
   vibrations[4] = vibration4;
   vibrations[0] = vibrationThumb;
 
-
-  for(int i = 0; i<5; i++)
-  {
-    analogWrite(vibrations[i], SPEED);
-    delay(1000);
-    analogWrite(vibrations[i], 0);
-    delay(2000);
-  }
+  // test all
+  // for(int i = 0; i<5; i++)
+  // {
+  //   analogWrite(vibrations[i], SPEED);
+  //   delay(1000);
+  //   analogWrite(vibrations[i], 0);
+  //   delay(2000);
+  // }
 
 
   ledArray[1] = led1;
@@ -272,7 +272,7 @@ void showComo() {
 }
 
 void showThumb() {
-  Serial.println("daumen drücken");
+  // Serial.println("daumen drücken");
     oled.clearDisplay();
     oled.setTextSize(3);
     oled.setTextColor(WHITE);
@@ -314,8 +314,8 @@ void startCorsi() {
   oled.setCursor(1, 35);
   oled.println("to start!");
   oled.display();
-  Serial.print("Corsi Start: ");
-  Serial.println("Press Button");
+  // Serial.print("Corsi Start: ");
+  // Serial.println("Press Button");
 }
 
 void showCorsi() {
@@ -330,8 +330,8 @@ void showCorsi() {
   oled.setCursor(10, 35);
   oled.println("Running");
   oled.display();
-  Serial.print("Corsi");
-  Serial.println("Running");
+  // Serial.print("Corsi");
+  // Serial.println("Running");
 }
 
 void showScore(int score) {
@@ -342,12 +342,12 @@ void showScore(int score) {
   // oled.setCursor(1, 1);
   // oled.println(">");
   oled.setCursor(20, 10);
-  oled.println("Score:");
+  oled.println("Level:");
   oled.setCursor(20, 35);
-  oled.println(score);
+  oled.println(score+1);
   oled.display();
-  Serial.print("Corsi Score: ");
-  Serial.println(score);
+  // Serial.print("Corsi Score: ");
+  // Serial.println(score);
 }
 
 

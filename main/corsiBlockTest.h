@@ -23,6 +23,7 @@ private:
     int userInputIndex;  // Tracks user input position
     int LIGHT_TIME = 500; // ms
     int threshold;
+    int releaseThreshold;
     int score = -1;
     bool vibration = false;
 
