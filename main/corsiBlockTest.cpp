@@ -16,6 +16,17 @@ CorsiBlockTest::CorsiBlockTest(int maxSequenceLength, bool withVibration) {
   releaseThreshold = threshold - 20; // offset for debouncing
 }
 
+void CorsiBlockTest::setVibration(bool withVibration)
+{
+  this->vibration = withVibration;
+  if (vibration) {
+    threshold = THRESHOLD_VIB;
+  } else {
+    threshold = THRESHOLD;
+  }
+  releaseThreshold = threshold - 20; // offset for debouncing
+}
+
 void CorsiBlockTest::begin() {
   //randomSeed(analogRead(0));  // Initialize random seed
   // generateSequence();

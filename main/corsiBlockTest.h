@@ -14,6 +14,7 @@ public:
     void runCorsiBlockTest();
     int getScore();
     void setSpeed(int speed);
+    void setVibration(bool withVibration);
     
 private:
     int* sequence;  // Holds the sequence of block indexes

@@ -18,13 +18,14 @@ int buttonScroll;
 int vibrations[5];
 int ledArray[5];
 int menu = 1;
+bool withVibration = false;
 
 // declare an SSD1306 display object connected to I2C
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 Adafruit_NeoPixel leds(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
-CorsiBlockTest corsi(9, true);
+CorsiBlockTest corsi(9, false);
 
 
 //flags for button pushes
@@ -34,10 +35,9 @@ bool prestate3;
 bool prestate4;
 bool prestateThumb;
 
-Mode mode = both; // default
+Mode mode = both;  // default
 
-void setup()
-{
+void setup() {
   Serial.begin(9600);
   //initialization of pins
   pinMode(vibration1, OUTPUT);
@@ -57,28 +57,31 @@ void setup()
   // initialize OLED display with address 0x3C for 128x64
   if (!oled.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println(F("SSD1306 allocation failed"));
-    while (true);
+    while (true)
+      ;
   }
-  delay(2000);         // wait for initializing
+  delay(2000);  // wait for initializing
 
   // showComo();
-  leds.begin();           // INITIALIZE NeoPixel leds object (REQUIRED)
-  leds.show();            // Turn OFF all pixels ASAP
+  leds.begin();  // INITIALIZE NeoPixel leds object (REQUIRED)
+  leds.show();   // Turn OFF all pixels ASAP
   leds.setBrightness(BRIGHTNESS);
   rainbowFade2White(3, 3, 1);
-  
+
   selectThumb();
   initialize();
+
+  // select with or without vibration
+  selectVibration();
 
 
   startCorsi();
 
   corsi.setSpeed(5);
-
+  corsi.setVibration(withVibration);
 }
 
-void loop()
-{
+void loop() {
   // updateMenu();
 
   // scroll menu
@@ -96,16 +99,16 @@ void loop()
   // }
 
   // select game
-  if (analogRead(buttonThumb) >= THRESHOLD){ //} && !prestateSelect) {
-    
+  if (analogRead(buttonThumb) >= THRESHOLD) {  //} && !prestateSelect) {
+
     showCorsi();
-    
+
     startGame();
     // If done show score and wait
 
     showScore(corsi.getScore());
 
-    delay(5000); // for safety, it should stay there anyways
+    delay(5000);  // for safety, it should stay there anyways
 
     // prestateSelect = true;
   }
@@ -130,12 +133,11 @@ void selectThumb() {
       oled.clearDisplay();
       oled.setCursor(10, 20);
       oled.setTextSize(3);
-      oled.println("RECHTS");
+      oled.println("RIGHT");
       oled.display();
       delay(1500);
       thumbRecognition = true;
-    }
-    else if (map(analogRead(buttonThumbRight), 0, 80, 0, 100) >= THRESHOLD) {
+    } else if (map(analogRead(buttonThumbRight), 0, 80, 0, 100) >= THRESHOLD) {
       buttonThumb = buttonThumbRight;
       vibrationThumb = vibrationThumbRight;
       buttonScroll = A3;
@@ -144,10 +146,42 @@ void selectThumb() {
       oled.clearDisplay();
       oled.setCursor(20, 20);
       oled.setTextSize(3);
-      oled.println("LINKS");
+      oled.println("LEFT");
       oled.display();
       delay(1500);
       thumbRecognition = true;
+    }
+  }
+}
+
+void selectVibration()
+{
+  // show on display
+
+  showVibration();
+
+  bool vibRecognition = false;
+
+  while (!vibRecognition) {
+    if (getFinger1() >= THRESHOLD) {
+      withVibration = false;
+      oled.clearDisplay();
+      oled.setCursor(1, 20);
+      oled.setTextSize(2);
+      oled.println("VIB OFF");
+      oled.display();
+      delay(1500);
+      vibRecognition = true;
+    } else if (getFinger2() >= THRESHOLD) {
+      withVibration = true;
+      // Serial.println("links");
+      oled.clearDisplay();
+      oled.setCursor(1, 20);
+      oled.setTextSize(2);
+      oled.println("VIB ON");
+      oled.display();
+      delay(1500);
+      vibRecognition = true;
     }
   }
 }
@@ -176,8 +210,6 @@ void updateMenu () {
 }
 
 void startGame() {
-
-
   corsi.runCorsiBlockTest();
 
   // switch (menu) {
@@ -256,7 +288,7 @@ int getFinger4() {
 }
 
 int getThumb() {
-  return map(analogRead(buttonThumb), 0, 10, 0, 100); //50
+  return map(analogRead(buttonThumb), 0, 10, 0, 100);  //50
 }
 
 // --------------------------------------------------- OLED -------------------------------------------------------
@@ -273,15 +305,29 @@ void showComo() {
 
 void showThumb() {
   // Serial.println("daumen drücken");
-    oled.clearDisplay();
-    oled.setTextSize(3);
-    oled.setTextColor(WHITE);
-    oled.setCursor(13, 10);
-    oled.println("Daumen");
-    oled.setTextSize(2);
-    oled.setCursor(17, 40);
-    oled.println("druecken");
-    oled.display();
+  oled.clearDisplay();
+  oled.setTextSize(2);
+  oled.setTextColor(WHITE);
+  oled.setCursor(13, 10);
+  oled.println("Select");
+  oled.setTextSize(2);
+  oled.setCursor(17, 40);
+  oled.println("thumb");
+  oled.display();
+  
+}
+
+void showVibration() {
+  // Serial.println("daumen drücken");
+  oled.clearDisplay();
+  oled.setTextSize(2);
+  oled.setTextColor(WHITE);
+  oled.setCursor(1, 10);
+  oled.println("I Vib OFF");
+  oled.setTextSize(2);
+  oled.setCursor(1, 40);
+  oled.println("M Vib ON");
+  oled.display();
   
 }
 
@@ -309,13 +355,13 @@ void startCorsi() {
   //oled.setCursor(1, game);
   // oled.setCursor(1, 1);
   // oled.println(">");
-  oled.setCursor(15, 10);
-  oled.println("Press");
+  oled.setCursor(1, 10);
+  oled.println("Thumb");
   oled.setCursor(1, 35);
   oled.println("to start!");
   oled.display();
   // Serial.print("Corsi Start: ");
-  // Serial.println("Press Button");
+  // Serial.println("Press Button");  
 }
 
 void showCorsi() {
@@ -344,7 +390,7 @@ void showScore(int score) {
   oled.setCursor(20, 10);
   oled.println("Level:");
   oled.setCursor(20, 35);
-  oled.println(score+1);
+  oled.println(score + 1);
   oled.display();
   // Serial.print("Corsi Score: ");
   // Serial.println(score);
@@ -381,37 +427,37 @@ void showMemoryStart() {
 // ------------------------------------------------------- LEDs -----------------------------------------------------------
 
 void rainbowFade2White(int wait, int rainbowLoops, int whiteLoops) {
-  int fadeVal=0, fadeMax=100;
-  
-  for(uint32_t firstPixelHue = 0; firstPixelHue < rainbowLoops*65536;
-    firstPixelHue += 256) {
+  int fadeVal = 0, fadeMax = 100;
 
-    for(int i=0; i<leds.numPixels(); i++) { // For each pixel in leds...
+  for (uint32_t firstPixelHue = 0; firstPixelHue < rainbowLoops * 65536;
+       firstPixelHue += 256) {
+
+    for (int i = 0; i < leds.numPixels(); i++) {  // For each pixel in leds...
       uint32_t pixelHue = firstPixelHue + (i * 65536L / leds.numPixels());
       leds.setPixelColor(i, leds.gamma32(leds.ColorHSV(pixelHue, 255,
-        255 * fadeVal / fadeMax)));
+                                                       255 * fadeVal / fadeMax)));
     }
 
     leds.show();
     delay(wait);
 
-    if(firstPixelHue < 65536) {                              // First loop,
-      if(fadeVal < fadeMax) fadeVal++;                       // fade in
-    } else if(firstPixelHue >= ((rainbowLoops-1) * 65536)) { // Last loop,
-      if(fadeVal > 0) fadeVal--;                             // fade out
+    if (firstPixelHue < 65536) {                                 // First loop,
+      if (fadeVal < fadeMax) fadeVal++;                          // fade in
+    } else if (firstPixelHue >= ((rainbowLoops - 1) * 65536)) {  // Last loop,
+      if (fadeVal > 0) fadeVal--;                                // fade out
     } else {
-      fadeVal = fadeMax; // Interim loop, make sure fade is at max
+      fadeVal = fadeMax;  // Interim loop, make sure fade is at max
     }
   }
 
-  for(int k=0; k<whiteLoops; k++) {
-    for(int j=0; j<256; j++) { // Ramp up 0 to 255
+  for (int k = 0; k < whiteLoops; k++) {
+    for (int j = 0; j < 256; j++) {  // Ramp up 0 to 255
       // Fill entire leds with white at gamma-corrected brightness level 'j':
       leds.fill(leds.Color(0, 0, 0, leds.gamma8(j)));
       leds.show();
     }
-    delay(1000); // Pause 1 second
-    for(int j=255; j>=0; j--) { // Ramp down 255 to 0
+    delay(1000);                      // Pause 1 second
+    for (int j = 255; j >= 0; j--) {  // Ramp down 255 to 0
       leds.fill(leds.Color(0, 0, 0, leds.gamma8(j)));
       leds.show();
     }
@@ -423,13 +469,13 @@ void rainbowFade2White(int wait, int rainbowLoops, int whiteLoops) {
 //void ledOn(int led, int r = 0, int g = 150, int b = 100)
 void ledOn(int led, int r, int g, int b)
 {
-  leds.clear(); // Set all pixel colors to 'off'
+  leds.clear();  // Set all pixel colors to 'off'
   leds.setPixelColor(led, leds.Color(r, g, b));
-  leds.show();   // Send the updated pixel colors to the hardware. 
+  leds.show();  // Send the updated pixel colors to the hardware. 
 }
 
 void ledOff()
 {
-  leds.clear(); // Set all pixel colors to 'off'
+  leds.clear();  // Set all pixel colors to 'off'
   leds.show();   // Send the updated pixel colors to the hardware. 
 }
