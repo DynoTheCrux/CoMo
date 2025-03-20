@@ -3,7 +3,7 @@
 
 class CorsiBlockTest {
 public:
-    CorsiBlockTest(int maxSequenceLength, bool withVibration);
+    CorsiBlockTest(int maxSequenceLength);
 
     void begin();
     void generateSequence();
@@ -14,7 +14,7 @@ public:
     void runCorsiBlockTest();
     int getScore();
     void setSpeed(int speed);
-    void setVibration(bool withVibration);
+    void setMode(int showMode);
     
 private:
     int* sequence;  // Holds the sequence of block indexes
@@ -26,7 +26,7 @@ private:
     int threshold;
     int releaseThreshold;
     int score = -1;
-    bool vibration = false;
+    int showMode = 1; // 1 = both, 2 = vibration, 3 = Led
 
     void lightUpBlock(int blockIndex); // will be LED
     int getUserInput();  // get user Input from the buttons

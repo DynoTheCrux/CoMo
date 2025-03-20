@@ -18,14 +18,14 @@ int buttonScroll;
 int vibrations[5];
 int ledArray[5];
 int menu = 1;
-bool withVibration = false;
+int vibMode = 1;
 
 // declare an SSD1306 display object connected to I2C
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 Adafruit_NeoPixel leds(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
-CorsiBlockTest corsi(9, false);
+CorsiBlockTest corsi(9);
 
 
 //flags for button pushes
@@ -72,13 +72,13 @@ void setup() {
   initialize();
 
   // select with or without vibration
-  selectVibration();
+  selectMode();
 
 
   startCorsi();
 
   corsi.setSpeed(5);
-  corsi.setVibration(withVibration);
+  corsi.setMode(vibMode);
 }
 
 void loop() {
@@ -154,7 +154,7 @@ void selectThumb() {
   }
 }
 
-void selectVibration()
+void selectMode()
 {
   // show on display
 
@@ -164,21 +164,31 @@ void selectVibration()
 
   while (!vibRecognition) {
     if (getFinger1() >= THRESHOLD) {
-      withVibration = false;
+      vibMode = 3;
       oled.clearDisplay();
       oled.setCursor(1, 20);
       oled.setTextSize(2);
-      oled.println("VIB OFF");
+      oled.println("LED");
       oled.display();
       delay(1500);
       vibRecognition = true;
     } else if (getFinger2() >= THRESHOLD) {
-      withVibration = true;
+      vibMode = 2;
       // Serial.println("links");
       oled.clearDisplay();
       oled.setCursor(1, 20);
       oled.setTextSize(2);
-      oled.println("VIB ON");
+      oled.println("VIB");
+      oled.display();
+      delay(1500);
+      vibRecognition = true;
+    } else if (getFinger3() >= THRESHOLD) {
+      vibMode = 1;
+      // Serial.println("links");
+      oled.clearDisplay();
+      oled.setCursor(1, 20);
+      oled.setTextSize(2);
+      oled.println("BOTH");
       oled.display();
       delay(1500);
       vibRecognition = true;
@@ -322,11 +332,14 @@ void showVibration() {
   oled.clearDisplay();
   oled.setTextSize(2);
   oled.setTextColor(WHITE);
-  oled.setCursor(1, 10);
-  oled.println("I Vib OFF");
+  oled.setCursor(1, 5);
+  oled.println("I LED");
   oled.setTextSize(2);
-  oled.setCursor(1, 40);
-  oled.println("M Vib ON");
+  oled.setCursor(1, 25);
+  oled.println("M Vib");
+  oled.setTextSize(2);
+  oled.setCursor(1, 45);
+  oled.println("R Both");
   oled.display();
   
 }
@@ -372,7 +385,7 @@ void showCorsi() {
   // oled.setCursor(1, 1);
   // oled.println(">");
   oled.setCursor(10, 10);
-  oled.println("Corsi");
+  oled.println("COMO");
   oled.setCursor(10, 35);
   oled.println("Running");
   oled.display();
@@ -388,9 +401,9 @@ void showScore(int score) {
   // oled.setCursor(1, 1);
   // oled.println(">");
   oled.setCursor(20, 10);
-  oled.println("Level:");
-  oled.setCursor(20, 35);
-  oled.println(score + 1);
+  oled.println("Done!");
+  // oled.setCursor(20, 35);
+  // oled.println(score + 1);
   oled.display();
   // Serial.print("Corsi Score: ");
   // Serial.println(score);

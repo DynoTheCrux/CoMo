@@ -2,24 +2,23 @@
 #include "definitions.h"
 
 
-CorsiBlockTest::CorsiBlockTest(int maxSequenceLength, bool withVibration) {
+CorsiBlockTest::CorsiBlockTest(int maxSequenceLength) {
   this->maxSequenceLength = maxSequenceLength;
   this->sequenceLength = 2;  // Start with 2 blocks
   this->sequence = new int[maxSequenceLength];
   this->userInputIndex = 0;
-  this->vibration = withVibration;
-  if (vibration) {
-    threshold = THRESHOLD_VIB;
-  } else {
-    threshold = THRESHOLD;
-  }
-  releaseThreshold = threshold - 20; // offset for debouncing
+  // if (vibration) {
+  //   threshold = THRESHOLD_VIB;
+  // } else {
+  //   threshold = THRESHOLD;
+  // }
+  // releaseThreshold = threshold - 20; // offset for debouncing
 }
 
-void CorsiBlockTest::setVibration(bool withVibration)
+void CorsiBlockTest::setMode(int showMode)
 {
-  this->vibration = withVibration;
-  if (vibration) {
+  this->showMode = showMode;
+  if (showMode < 3) {
     threshold = THRESHOLD_VIB;
   } else {
     threshold = THRESHOLD;
@@ -46,8 +45,13 @@ void CorsiBlockTest::generateSequence() {
 void CorsiBlockTest::playSequence() {
   for (int i = 0; i < sequenceLength; i++) {
     delay(LIGHT_TIME);
-    lightUpBlock(sequence[i]);
-    if(vibration)
+
+    if (showMode != 2)
+    {
+      lightUpBlock(sequence[i]);
+    }
+
+    if(showMode < 3)
     {
       analogWrite(vibrations[sequence[i]], SPEED);
     }
@@ -100,31 +104,33 @@ int CorsiBlockTest::checkUserInput() {
 
   while (waitForPress) {
     if (getFinger1() > threshold) {
-      ledOn(1);
+      ledOn(1, 0, 200, 0);
       result = 1;
       waitForPress = false;
     } else if (getFinger2() > threshold) {
-      ledOn(2);
+      ledOn(2, 0, 200, 0);
       result = 2;
       waitForPress = false;
 
     } else if (getFinger3() > threshold) {
-      ledOn(3);
+      ledOn(3, 0, 200, 0);
       result = 3;
       waitForPress = false;
 
     } else if (getFinger4() > threshold) {
       //Serial.println(getFinger4());
-      ledOn(4);
+      ledOn(4, 0, 200, 0);
       result = 4;
       waitForPress = false;
 
     } else if (getThumb() > threshold) {
       
-      ledOn(ledThumb);
+      ledOn(ledThumb, 0, 200, 0);
       result = 0; // hardcode for two thumbs...
       waitForPress = false;
     }
+
+
   }
 
   // Serial.println(result);
